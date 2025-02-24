@@ -11,6 +11,9 @@ def calculate_pricing(team_size, burden_rate, gpm):
     charge_rate_per_hour = required_revenue / hours_per_month
     return total_monthly_cost, required_revenue, charge_rate_per_hour
 
+def calculate_core_hours_coverage(shift_df):
+    return shift_df["Resources Needed"].sum()
+
 # Streamlit UI
 st.set_page_config(page_title="IT Support Auto-Updating Calculator", layout="wide")
 st.title("IT Support Auto-Updating Calculator")
@@ -30,6 +33,11 @@ st.write(f"**Total Monthly Cost:** ${total_monthly_cost:,.2f}")
 st.write(f"**Required Monthly Revenue:** ${required_revenue:,.2f}")
 st.write(f"**Charge Rate per Hour:** ${charge_rate_per_hour:,.2f}")
 
+# Core Support Hours Variable
+st.sidebar.header("Core Support Hours")
+core_support_hours = "10 AM - 2 PM (Local Time for Each Region)"
+st.sidebar.write(f"**Defined Core Support Hours:** {core_support_hours}")
+
 # Shift Coverage Table
 st.subheader("Updated Shift Coverage (Anchored in Eastern Time)")
 shift_data = {
@@ -39,6 +47,10 @@ shift_data = {
 }
 shift_df = pd.DataFrame(shift_data)
 st.dataframe(shift_df)
+
+# Calculate core hours coverage
+total_core_hours_coverage = calculate_core_hours_coverage(shift_df)
+st.write(f"**Total Resources Required During Core Support Hours:** {total_core_hours_coverage}")
 
 # Visual Representation of Shift Coverage
 st.subheader("Shift Coverage Visualization")
