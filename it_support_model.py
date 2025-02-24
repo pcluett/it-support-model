@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 def calculate_pricing(team_size, burden_rate, gpm):
     hours_per_week = team_size * 37.5
@@ -11,18 +12,20 @@ def calculate_pricing(team_size, burden_rate, gpm):
     return total_monthly_cost, required_revenue, charge_rate_per_hour
 
 # Streamlit UI
-st.title("IT Support Coverage Model Calculator")
+st.set_page_config(page_title="IT Support Auto-Updating Calculator", layout="wide")
+st.title("IT Support Auto-Updating Calculator")
 
-# User Inputs
-team_size = st.slider("Number of Team Members", 9, 12, 11)
-burden_rate = st.number_input("Burden Cost Rate per Hour ($)", min_value=50, max_value=200, value=100)
-gpm = st.slider("Target Gross Profit Margin (%)", 20, 60, 45) / 100
+# Sidebar for user inputs
+st.sidebar.header("Input Variables")
+team_size = int(st.sidebar.text_input("Number of Team Members", value="11"))
+burden_rate = float(st.sidebar.text_input("Burden Cost Rate per Hour ($)", value="100"))
+gpm = float(st.sidebar.text_input("Target Gross Profit Margin (%)", value="45")) / 100
 
-# Calculate results
+# Auto-update calculations
 total_monthly_cost, required_revenue, charge_rate_per_hour = calculate_pricing(team_size, burden_rate, gpm)
 
 # Display results
-st.subheader("Results")
+st.subheader("Results (Auto-Updated)")
 st.write(f"**Total Monthly Cost:** ${total_monthly_cost:,.2f}")
 st.write(f"**Required Monthly Revenue:** ${required_revenue:,.2f}")
 st.write(f"**Charge Rate per Hour:** ${charge_rate_per_hour:,.2f}")
@@ -36,3 +39,12 @@ shift_data = {
 }
 shift_df = pd.DataFrame(shift_data)
 st.dataframe(shift_df)
+
+# Visual Representation of Shift Coverage
+st.subheader("Shift Coverage Visualization")
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.barh(shift_df["Shift (ET)"], shift_df["Resources Needed"], color='skyblue')
+ax.set_xlabel("Number of People Working")
+ax.set_ylabel("Shift Time (ET)")
+ax.set_title("Number of People Working at Any Given Time")
+st.pyplot(fig)
